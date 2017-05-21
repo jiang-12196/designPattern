@@ -41,6 +41,17 @@ public:  int ShoutNum {
                 shoutNum = value;
             };
     };
+public:virtual string Shout(){
+        string result = "";
+        for (int i =0 ; i<shoutNum; i++) {
+            result += getShoutSound() + ",";
+        }
+        return result;
+    }
+
+protected:virtual string getShoutSound() {
+        return "";
+    }
 };
 
 
@@ -53,11 +64,41 @@ public:Cat(string name):base(name){
 
     }
 
-public: string Shout(){
-        string result = "";
-        for(int i=0; i < shoutNum; i++){
-            result += "喵";
+protected:override string getShoutSound() {
+        return "喵";
+    }
+
+//public: string override Shout(){
+//        string result = "";
+//        for(int i=0; i < shoutNum; i++){
+//            result += "喵";
+//        }
+//        return "我的名字叫"+name;
+//    }
+};
+
+interface IChange {
+        string ChangeThing(string thing);
+};
+
+class MachineCat: Cat, IChange {
+public:MachineCat() {
+        : base(){}
+        MachineCat(string name) {
+            : base(name)
         }
-        return "我的名字叫"+name;
+        string ChangeThing(string thing) {
+            return base.Shout() + "我有万能的口袋，我能变成"+ thing;
+        }
     }
 };
+
+private void button6_Click(object sender,EventArgs e) {
+    MachineCat mcat = new MachineCat("小叮当");
+    StoneMonkey wukong = new StoneMonkey("孙悟空");
+    IChange[] array = new IChange[2];
+    array[0] = mcat;
+    array[1] = wukong;
+    MessageBox.Show(array[0].ChangeThing("every thing"));
+    MessageBox.Show(array[1].ChangeThing("72 bian"));
+}
