@@ -91,6 +91,8 @@ class NBAObserver : Observer {
     }
 }
 
+
+// 客户端代码
 Boss jiang = new Boss();
 
 StockObserver  tongshi1 = new StockObserver('zuohan', jiang)
@@ -105,4 +107,69 @@ jiang.SubjectState = 'bost come back';
 jiang.Notify();
 
 
-abstract class Subject 
+
+// 
+abstract class Subject {
+    private IList<Observer> observer = new List<Observer>
+
+    public void Attach(Observer observer){
+        Observers.Add(Observer)
+    }
+
+    public void Detach(Observer observer){
+        Observer.Remove(observer);
+    }
+
+    public void Notify() {
+        foreach (Observer o in observers) {
+            o.Update();
+        }
+    }
+}
+
+abstract class Observer {
+    public abstract void Update();
+}
+
+class ConcreteSubject :Subject {
+    private string SubjectState;
+    public string SubjectState {
+        get {return SubjectState; }
+        set {SubjectState = value; }
+    }
+}
+
+class ConcreteObserver : Observer {
+    private string name;
+    private string observerState;
+    private ConcreteSubject subject;
+
+    public ConcreteObserver(ConcreteSubject subject, string name){
+        this.subject = subject;
+        this.name = name;
+    }
+
+    public override void Update() {
+        observerState = subject.SubjectState;
+        Console.ＷriteLine("观察者｛０｝的状态｛１｝", name, observerState);
+    }
+
+    public ConcreteSubject Subject{
+        get {return subject}
+        set {subject = value}
+    }
+}
+
+
+static void Main(string[] args) {
+    ConcreteSubject s = new ConcreteSubject();
+    s.Attach(new ConcreteObserver(s, "x"))
+    s.Attach(new ConcreteObserver(s, "y"))
+    s.Attach(new ConcreteObserver(s, "z"))
+
+    s.SubjectState = "happy";
+
+    s.Notify();
+
+    Console.Read();
+}
