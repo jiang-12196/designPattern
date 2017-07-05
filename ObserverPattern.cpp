@@ -103,3 +103,6 @@ jiang.Detach(tongshi1);
 
 jiang.SubjectState = 'bost come back';
 jiang.Notify();
+
+
+abstract class Subject 
