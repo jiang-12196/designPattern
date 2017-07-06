@@ -49,3 +49,60 @@ static void Main(string[] args) {
     iu.GetUser(1);
     Console.Read();
 }
+
+
+// simpleFactory
+
+class DataAccess {
+    private static readonly string db = 'SqlServer';
+    private static readonly string db = 'AccessServer';
+
+    public static IUser CreateUser() {
+        IUser result = null;
+        switch(db) {
+            case 'SqlServer':
+                resule = new SqlServerUser();
+                break
+            case 'AccessServer':
+                result = new AccessUser();
+                break;
+
+        }
+        return result
+    }
+
+
+    public static IDepartment CreateDepartment() {
+        IDepartment result = null;
+        switch(db) {
+            case 'SqlServer':
+                resule = new SqlServerDepartment();
+                break
+            case 'AccessServer':
+                result = new AccessDepartment();
+                break;
+
+        }
+        return result
+    }
+}
+
+
+static void Main(string[] args) {
+    User user = new User();
+    Department department = new Department();
+
+    IUser iu = DataAccess.CreateUser();
+
+    iu.Insert(user);
+    iu.GetUser(1);
+
+
+    IDepartment idep = DataAccess.CreateUser();
+
+    idep.Insert(department);
+    idep.GetUser(1);
+
+    Console.Read();
+
+}
