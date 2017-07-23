@@ -13,5 +13,8 @@ class ConcreteIterator : Iterator {
     private ConcreteAggregate aggregate;
     private int current = 0;
 
-    public ConcreteIterator(Con)
+    public ConcreteIterator(ConcerteAggregate aggregate){
+    	this.aggregate = aggregate;
+　　}
 }
+
