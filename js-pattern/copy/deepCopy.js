@@ -7,23 +7,28 @@ var data = {
     status: 200
 };
 
+
 var obj = {};
 
-shallowCopy(data, obj);
+deepCopy(data, obj);
 
 obj.status = 201;
 obj.items[0].name = 'jiangzuohan';
 console.log('子对象－－－－>',JSON.stringify(obj));
 console.log('父对象－－－>',JSON.stringify(data));
-//浅拷贝，改变子对象的值，父对象也跟着改变
 
 
-function shallowCopy(src, des) {
-    var desObj = des || {};
+function deepCopy(src, destObj) {
+    var destObj = destObj || {};
     for (var key in src) {
-        if(!des.hasOwnProperty(key)){
-            desObj[key] = src[key]
+        if(!destObj.hasOwnProperty(key)) {
+            if(typeof src[key] === 'object') {
+                destObj[key] = (src[key].constructor === Array) ? [] : {};
+                deepCopy(src[key], destObj[key])
+            } else {
+                destObj[key] = src[key]
+            }
         }
     }
-    return desObj;
+    return destObj;
 }
