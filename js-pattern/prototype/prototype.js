@@ -4,6 +4,7 @@ window.onload = function () {
         F.prototype = obj.prototype;
         newobj.prototype = new F();
     }
+    
     var Field = function (id) {
         this.id = id;
     };
@@ -14,6 +15,7 @@ window.onload = function () {
     Field.prototype.getValue = function () {
         throw new Error("you should override this method");
     };
+
     var InputField = function (label, id, type) {
         Field.call(this, id);
         this.input = document.createElement('input');
@@ -31,6 +33,7 @@ window.onload = function () {
     InputField.prototype.getValue = function () {
         return this.input.value;
     };
+
     var SelectField = function (label, id, arr) {
         Field.call(this, id);
         this.select = document.createElement('select');
@@ -53,10 +56,13 @@ window.onload = function () {
     SelectField.prototype.getValue = function () {
         return this.select.options[this.select.selectedIndex].value;
     };
+
     var input = new InputField('用户名', 'userName', 'text');
     var select = new SelectField('国家', 'country', [{text: '美国', value: 'us'}, {text: '中国', value: 'china'}]);
+
     document.body.appendChild(input.divElement);
     document.body.appendChild(select.divElement);
+
     function sub() {
         input.save();
         select.save();
