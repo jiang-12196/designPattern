@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>组合＋策略模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    var strategies = {
+        minLength: function (value, num ,errorMsg) {
+            if(value.length < num) {
+                return errorMsg
+            }
+            return null;
+        },
+        isNotEmpty: function (value, errorMsg) {
+            if (value === '') {
+                return errorMsg
+            }
+            return null;
+        },
+        isMobile: function (value, errorMsg) {
+            if (!/^1[3|5|8][0-9]{9}$/.test(value)) {
+                return errorMsg
+            }
+            return null;
+        }
+    };
+
+    var Validator = function () {
+        this.cache = [];
+    };
+
+    Validator.prototype.add = function (dom, rule, errorMsg) {
+        var arr = rule.split(":");
+        this.cache.push(function () {
+            var strategy = arr.shift();
+            arr.unshift(dom);
+            arr.push(errorMsg);
+            return strategies[strategy].apply(dom, arr);
+        })
+    };
+
+    Validator.prototype.start = function () {
+        for(var i=0; i<this.cache.length; i++) {
+            var msg = this.cache[i]();
+            if(msg) {
+                return msg;
+            }
+        }
+        return 'nothing';
+    };
+    function extend(newobj, obj) {
+        var F = function () {};
+        F.prototype = obj.prototype;
+        newobj.prototype = new F();
+    }
+
+    var Field = function (id) {
+        this.id = id;
+        this.divElement;
+    };
+    Field.prototype.save = function () {
+        sessionStorage.setItem(this.id, this.getValue());
+        console.log(sessionStorage.getItem(this.id));
+    };
+    Field.prototype.getDivElement = function () {
+        return this.divElement;
+    }
+    Field.prototype.getValue = function () {
+        throw new Error("you should override this method");
+    };
+
+    var InputField = function (label, id, type) {
+        Field.call(this, id);
+        this.input = document.createElement('input');
+        this.input.name = id;
+        this.input.type = type;
+        this.label = document.createElement('label');
+        var labelTextNode = document.createTextNode(label);
+        this.label.appendChild(labelTextNode);
+        this.divElement = document.createElement('div');
+        this.divElement.id = id;
+        this.divElement.className = 'input-field';
+        this.divElement.appendChild(this.label);
+        this.divElement.appendChild(this.input);
+    };
+    extend(InputField, Field);
+    InputField.prototype.getValue = function () {
+        return this.input.value;
+    };
+
+    var SelectField = function (label, id, arr) {
+        Field.call(this, id);
+        this.select = document.createElement('select');
+        for(var i=0; i<arr.length; i++) {
+            var option = document.createElement('option');
+            option.text = arr[i]['text'];
+            option.value = arr[i]['value'];
+            this.select.options[i] = option;
+        }
+        this.label = document.createElement('label');
+        var labelTextNode = document.createTextNode(label);
+        this.label.appendChild(labelTextNode);
+        this.divElement = document.createElement('div');
+        this.divElement.id = id;
+        this.divElement.className = 'select-field';
+        this.divElement.appendChild(this.label);
+        this.divElement.appendChild(this.select);
+    };
+    extend(SelectField, Field);
+    SelectField.prototype.getValue = function () {
+        return this.select.options[this.select.selectedIndex].value;
+    };
+
+    var CompositeFieldSet = function (id, legendText) {
+        this.components = {};
+        this.id = id;
+        this.element = document.createElement('fieldset');
+        this.element.id = id;
+        if(legendText) {
+            this.legend = document.createElement('legend');
+            this.legend.appendChild(document.createTextNode(legendText));
+            this.element.appendChild(this.legend);
+        }
+    };
+    CompositeFieldSet.prototype.add = function (child) {
+        this.components[child.getDivElement().id] = child;
+        this.element.appendChild(child.getDivElement());
+    };
+    CompositeFieldSet.prototype.getElement = function () {
+        return this.element;
+    };
+    CompositeFieldSet.prototype.save = function () {
+        console.log(this.components);
+        for(var i in this.components) {
+            if(!this.components.hasOwnProperty(id)) {
+                continue;
+            }
+            this.components[id].save()
+        }
+    };
+    CompositeFieldSet.prototype.remove = function (id) {
+        var child;
+        for(var key in this.components) {
+            if(this.components[key]['id'] === id) {
+                child = this.components[key];
+                delete this.components[child.getDivElement().id];
+                this.element.removeChild(child.getDivElement());
+                break;
+            }
+        }
+    };
+
+    var CompositeForm = function (id) {
+        this.formComponents = [];
+        this.formElement = document.createElement('form');
+        this.formElement.id = id;
+        this.formElement.onsumbit = function () {
+            return false;
+        }
+    };
+    CompositeForm.prototype.add = function (child) {
+      this.formComponents.push(child);
+      this.formElement.appendChild(child.getElement());
+    };
+    CompositeForm.prototype.save = function () {
+        for(var i=0; i<this.formComponents.length;i++) {
+            this.formComponents[i].save();
+        }
+    };
+    CompositeForm.prototype.remove = function (id) {
+        var child;
+        for(var i=0;i<this.formComponents.length;i++) {
+            if(this.formComponents[i]['id'] === id) {
+                child = this.formComponents[i];
+                this.formComponents.splice(i,1);
+                this.formElement.removeChild(child.getDivElement());
+                break;
+            }
+        }
+    };
+    CompositeForm.prototype.getFinalElement = function () {
+        var submitButton = document.createElement('input');
+        submitButton.id = 'sub';
+        submitButton.type = 'submit';
+        this.formElement.appendChild(submitButton);
+        return this.formElement;
+    };
+
+    var nameFieldSet = new CompositeFieldSet('name-fieldset', 'nameArea');
+    nameFieldSet.add(new InputField('first-name', 'firstName', 'text'));
+    nameFieldSet.add(new InputField('last-name', 'lastName', 'text'));
+    console.log(nameFieldSet);
+
+    var addressFieldSet = new CompositeFieldSet('address-fieldset', 'addressArea');
+    addressFieldSet.add(new SelectField('国家', 'country', [{text: '美国', value: 'us'}, {text: '中国', value: 'china'}]));
+    addressFieldSet.add(new InputField('地址', 'address', 'text'));
+    addressFieldSet.add(new InputField('手机号', 'iphone', 'text'));
+
+    var testFieldSet = new CompositeFieldSet('test-fieldset', 'testArea');
+    testFieldSet.add(new InputField('测试','test', 'test'));
+
+    var form = new CompositeForm('contact-form');
+
+    form.add(nameFieldSet);
+    form.add(addressFieldSet);
+    form.add(testFieldSet);
+
+    console.log(form);
+
+    var formNode = form.getFinalElement();
+    document.body.appendChild(formNode);
+
+    var todoFunc = function () {
+        var validator = new Validator();
+        validator.add(formNode.firstName, [
+            {strategy: 'isNonEmpty', errorMsg: 'firstName不能为空'},
+            {strategy: 'minLength:5', errorMsg: 'firstName不能小于５'}
+        ]);
+        validator.add(formNode.lastName, [
+            {strategy: 'isNonEmpty', errorMsg: 'lastName不能为空'},
+            {strategy: 'minLength:3', errorMsg: 'lastName不能小于3'}
+        ]);
+
+        validator.add(formNode.address, [
+            {strategy: 'isNonEmpty', errorMsg: 'address不能为空'},
+            {strategy: 'minLength:10', errorMsg: 'address不能小于10'}
+        ]);
+
+        validator.add(formNode.phone, [
+            {strategy: 'isNonEmpty', errorMsg: 'phone不能为空'},
+            {strategy: 'isMobile', errorMsg: '手机格式不正确'}
+        ]);
+        var errorMsg = validator.start();
+        return errorMsg;
+    };
+
+    document.getElementById('sub').onclick = function () {
+        form.save();
+        var errorMsg = todoFunc();
+        if(errorMsg) {
+            alert(errorMsg);
+        }
+        return false;
+    }
+</script>
