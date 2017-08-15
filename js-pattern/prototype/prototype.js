@@ -4,7 +4,7 @@ window.onload = function () {
         F.prototype = obj.prototype;
         newobj.prototype = new F();
     }
-    
+
     var Field = function (id) {
         this.id = id;
     };
