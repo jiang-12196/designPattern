@@ -34,7 +34,30 @@
         this.cache = [];
     };
 
-    Validator.prototype.add = function (dom, rule, errorMsg) {
+//    Validator.prototype.add = function (dom, rule, errorMsg) {
+//        var arr = rule.split(":");
+//        this.cache.push(function () {
+//            var strategy = arr.shift();
+//            arr.unshift(dom);
+//            arr.push(errorMsg);
+//            return strategies[strategy].apply(dom, arr);
+//        })
+//    };
+
+    Validator.prototype.add = function (dom, rules) {
+        var self = this;
+        for(var i=0;i<rules.length;i++) {
+            (function (rule) {
+               var arr = rule.strategy.split(':');
+               var errorMsg = rule.errorMsg;
+               self.cache.push(function () {
+                   var strategy = arr.shift();
+                   arr.unshift(dom.value);
+                   arr.push(errorMsg);
+                   return strategies[strategy].apply(dom, arr);
+               });
+            })(rules[i]);
+        }
         var arr = rule.split(":");
         this.cache.push(function () {
             var strategy = arr.shift();

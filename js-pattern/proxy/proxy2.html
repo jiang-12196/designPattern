@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>laoding - parttern</title>
+</head>
+<body>
+</body>
+</html>
+<script>
+    var myImage = (function () {
+        var imgNode = document.createElement('img');
+        document.body.appendChild(imgNode);
+        return {
+            setSrc: function (src) {
+                imgNode.src = src;
+            }
+        }
+    })();
+    var proxyImage = (function () {
+        var img = new Image();
+        img.onload = function () {
+            debugger;
+            myImage.setSrc(this.src);
+        };
+        return {
+            setSrc: function (src) {
+                myImage.setSrc('http://www.sznews.com/humor/attachement/gif/site3/20161111/IMG7427ea1ea3a34288489193.gif');
+                img.src = src;
+            }
+        }
+    })();
+    proxyImage.setSrc('http://img4.178.com/news/201702/281324199461/281326406289.gif');
+</script>

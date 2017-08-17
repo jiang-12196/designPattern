@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>无模式图片加载</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    var myImage = (function () {
+        var imgNode = document.createElement('img');
+        document.body.appendChild(imgNode);
+        var img = new Image();
+//        document.body.appendChild(img);
+        img.onload = function () {
+            imgNode.src = img.src;
+        };
+        return {
+            setSrc: function (src) {
+                imgNode.src = 'http://img4.178.com/news/201702/281324199461/281326406289.gif';
+                img.src = src;
+            }
+        };
+    })();
+    myImage.setSrc('http://kanimg.9ku.com/Article/20170727/1501135717121729.gif');
+</script>

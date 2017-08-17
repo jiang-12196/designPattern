@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>代理模式</title>
+    <style>
+        .hint {
+            padding: 10px 20px;
+            background: #ff704b;
+            text-align: center;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            border-radius: 3px;
+            color: #fff;
+            -webkit-animation: 0.5 shake;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+<button onclick="sub()">代理模式提示</button>
+</body>
+</html>
+<script>
+    var CreateHint = function (content) {
+        this.content = content;
+        this.init();
+    };
+    CreateHint.prototype.init = function () {
+        this.div = document.createElement('div');
+        this.div.className = 'hint';
+        this.div.innerHTML = this.content;
+        document.body.appendChild(this.div);
+    };
+    CreateHint.prototype.show = function (content) {
+        this.div.innerHTML = content;
+        this.div.style.display = 'block';
+        var that = this;
+        setTimeout(function () {
+            that.div.style.display = 'none';
+        },2000);
+    };
+    var Proxy = (function () {
+        var instance;
+        return function (content) {
+            if(!instance) {
+                instance = new CreateHint(content);
+            }
+            instance.show(content);
+            return instance;
+        }
+    })();
+    var a = new Proxy('hello jiang');
+    var b = new Proxy('hello zuohan');
+    function sub() {
+        var c = new Proxy('this is a test');
+        console.log(a==c);
+        console.log(b==c);
+    }
+</script>
