@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>object pool</title>
+</head>
+<body>
+<button onclick="first()">first click</button>
+<button onclick="recover()">recover click</button>
+<button onclick="second()">second click</button>
+</body>
+</html>
+<script>
+    var domFactory = (function () {
+        var pool = [];
+        return {
+            create: function () {
+                if(pool.length == 0) {
+                    var div = document.createElement('div');
+                    document.body.appendChild(div);
+                    return div;
+                } else {
+                    return pool.shift();
+                }
+            },
+            recover: function (dom) {
+                pool.push(dom);
+            }
+        };
+    })();
+    var arr = [];
+    function first() {
+        var tipArr = ['A', 'B'];
+        for(var i=0; i<tipArr.length;i++) {
+            var tip = domFactory.create();
+            tip.innerHTML = tipArr[i];
+            document.body.appendChild(tip);
+            arr.push(tip);
+        }
+    }
+    function recover() {
+        for(var i=0;i<arr.length;i++) {
+            domFactory.recover(arr[i])
+        }
+    }
+    function second() {
+        var tipArr2 = ['A','B','C','D','E'];
+        for(var i=0;i<tipArr2.length;i++) {
+            var newTip = domFactory.create();
+            newTip.innerHTML = tipArr2[i];
+            document.body.appendChild(newTip);
+            arr.push(newTip);
+        }
+    }
+</script>
