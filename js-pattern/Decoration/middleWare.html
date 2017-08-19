@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>中间变量法</title>
+</head>
+<body>
+<button id="btn">click</button>
+</body>
+</html>
+<script>
+//    var a = function () {
+//        console.log('装饰前');
+//    };
+//    var _a = a;
+//    a = function () {
+//        console.log('加入新功能');
+//        _a();
+//    };
+//    var _onload = window.onload;
+//    window.onload = function () {
+//        _onload();
+//        console.log('onload 加入新功能');
+//    }
+    var _getEle = document.getElementById;
+    document.getElementById = function (id) {
+        console.log('新功能');
+//        return _getEle(id);
+        return _getEle.apply(document, arguments);
+    };
+    var button = document.getElementById('btn');
+    button.onclick = function () {
+        console.log('test');
+    }
+</script>

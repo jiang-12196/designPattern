@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>装饰模式</title>
+</head>
+<body>
+<button id="btn">click</button>
+</body>
+</html>
+<script>
+    Function.prototype.before = function (beforeFn) {
+        var self = this;
+        console.log(this);
+        return function () {
+            console.log(this);
+            beforeFn.apply(this, arguments);
+            return self.apply(this, arguments);
+        }
+    };
+    Function.prototype.after = function (afterFn) {
+        var self = this;
+        console.log(this);
+        return function () {
+            console.log(this);
+            var res = self.apply(this, arguments);
+            afterFn.apply(this, arguments);
+            return res;
+        }
+    };
+//    document.getElementsByName = document.getElementsByName.before(function () {
+//        console.log('新功能');
+//
+//    });
+    document.getElementById = document.getElementById.before(function () {
+        console.log('装饰前');
+    });
+    document.getElementById = document.getElementById.after(function () {
+        console.log('装饰后');
+    });
+    var button = document.getElementById('btn');
+    button.onclick = function () {
+        console.log('test');
+    }
+</script>
