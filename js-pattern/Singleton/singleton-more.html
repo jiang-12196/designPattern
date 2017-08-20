@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>单例模式</title>
+    <style>
+        .hint {
+            padding: 10px 20px;
+            background: #ff704b;
+            text-align: center;
+            position: fixed;
+            top: 21%;
+            left: 20%;
+            border-radius: 3px;
+            color: #fff;
+            -webkit-animation: 0.5s shake;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+<button onclick="sub()">小小提示语</button>
+</body>
+</html>
+<script>
+    var CreateHint = (function () {
+        var instance;
+        console.log(instance);
+        var CreateHint = function (content) {
+            if(instance) {
+                instance.show(content);
+                return instance;
+            }
+            this.content = content;
+            this.div;
+            this.init();
+            instance = this;
+            return instance;
+        };
+        CreateHint.prototype.init = function () {
+            this.div = document.createElement('div');
+            this.div.className = 'hint';
+            this.div.innerHTML = this.content;
+            document.body.appendChild(this.div);
+        };
+
+        CreateHint.prototype.show = function (content) {
+            this.div.innerHTML = content;
+            this.div.style.display = 'block';
+            var that = this;
+            setTimeout(function () {
+                that.div.style.display = 'none';
+            }, 2000);
+        };
+        return CreateHint;
+    })();
+
+    var a = new CreateHint('hello jiang');
+    var b = new CreateHint('hello jiangzuohan');
+    console.log(a === b);
+    function sub() {
+        var c = new CreateHint('hahha');
+        console.log(a===c);
+        console.log(b===c);
+    }
+</script>

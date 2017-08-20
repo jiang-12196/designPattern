@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>订阅－观察者模式</title>
+    <script src="http://mockjs.com/dist/mock.js"></script>
+    <script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.js"></script>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    Mock.mock('http://ajax.login.com', {
+        'name':'@name',
+        'age|1-100':1
+    });
+    var event = {
+        eventList: {},
+        listen: function (key, fn) {
+            if(!this.eventList[key]) {
+                this.eventList[key] = [];
+            }
+            this.eventList[key].push(fn);
+        },
+        trigger: function () {
+            var key = Array.prototype.shift.call(arguments);
+            var fns = this.eventList[key];
+            if(!fns || fns.length === 0) {
+                return false;
+            }
+            for(var i=0; i<fns.length;i++) {
+                fns[i].apply(this, arguments);
+            }
+        },
+        remove: function (key, fn) {
+            var fns = this.eventList[key];
+            if(!fns) {
+                return false;
+            }
+            if(!fn) {
+                fns && (fns.length = 0);
+            } else {
+                for (var i=0; i<fns.length;i++) {
+                    if(fns[i] === fn) {
+                        fns.splice(i,1);
+                    }
+                }
+            }
+        }
+    };
+
+    var installEvent = function (obj) {
+        for(var i in event) {
+            obj[i] = event[i];
+        }
+    };
+    var login = {};
+    installEvent(login);
+    var avatar = (function () {
+       login.listen('loginSuccess', function (data) {
+           avatar.setAvatar(data);
+       });
+        return {
+            setAvatar: function (data) {
+                console.log('显示用户'+ data['name'] +'头像');
+            }
+        };
+    })();
+    var Message = (
+        function () {
+            login.listen('loginSuccess', function (data) {
+                Message.setMsg(data);
+            });
+            return {
+                setMsg: function (data) {
+                    setTimeout(function () {
+                        console.log('显示用户'+data['name']+'的消息');
+                    },1000)
+                }
+            }
+        }
+    )();
+    $.ajax({
+        url: 'http://ajax.login.com',
+        dataType: 'json',
+        success: function (data) {
+            login.trigger('loginSuccess', data);
+        }
+    })
+</script>

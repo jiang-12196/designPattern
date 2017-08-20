@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>单例模式</title>
+</head>
+<body>
+
+</body>
+</html>
+<script>
+    var Single = function (name) {
+        this.name = name;
+        this.instance = null;
+    };
+    Single.getInstance = function (name) {
+        if(!this.instance) {
+            this.instance = new Single(name);
+        }
+        return this.instance;
+    };
+    var jack = Single.getInstance('jack');
+    var tom = Single.getInstance('tom');
+    console.log("singleton---->",jack === tom);
+</script>
